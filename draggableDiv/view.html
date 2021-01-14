@@ -1,0 +1,112 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, 
+        initial-scale=1.0, 
+        user-scalable=no" />
+    <style>
+        #item {
+            width: 100px;
+            height: 100px;
+            background-color: yellow;
+            border: 10px solid pink;
+            border-radius: 50%;
+            touch-action: none;
+            user-select: none;
+            text-align: center;
+        }
+
+        #item p {
+            align-items: center;
+            margin-top: 35%;
+        }
+        #item:active {
+            background-color: lightblue;
+        }
+
+        #item:hover {
+            border-width: 30px;
+            cursor: grab;
+            background-color: lightblue;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            height: 100vh;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <div id="item">
+            <p>Drag me!</p>
+        </div>
+    </div>
+    <script>
+        var dragItem = document.querySelector("#item");
+        var container = document.querySelector(".container");
+
+        var active = false;
+        var currentX;
+        var currentY;
+        var initialX;
+        var initialY;
+        var xOffset = 0;
+        var yOffset = 0;
+        container.addEventListener("touchstart", dragStart, false);
+        container.addEventListener("touchend", dragEnd, false);
+        container.addEventListener("touchmove", drag, false);
+
+        container.addEventListener("mousedown", dragStart, false);
+        container.addEventListener("mouseup", dragEnd, false);
+        container.addEventListener("mousemove", drag, false);
+
+        function dragStart(e) {
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+
+            if (e.target === dragItem) {
+                active = true;
+            }
+            console.log(e.clientX, e.clientY, xOffset, yOffset, initialX, initialY)
+        }
+
+        function dragEnd(e) {
+            active = false;
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+
+                if (e.type === "touchmove") {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                setTranslate(currentX, currentY, dragItem);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        } 
+    </script>
+</body>
+
+</html>
