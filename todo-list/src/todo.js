@@ -58,10 +58,10 @@ export default class Todo extends Component {
                 return newTodo
             }
         })
-
         this.setState(state => ({
             ...state,
             currentTab: CURRENT_TAB,
+            allTodos: auxAllTodos,
         }))
     }
     finishedTab = () => {
