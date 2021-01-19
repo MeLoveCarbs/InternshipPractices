@@ -17,7 +17,7 @@
         .smallContainer {
             width: 20vh;
             height: 20vh;
-            background-color: silver;
+            background-color: red;
         }
     </style>
 </head>
@@ -30,22 +30,10 @@
     </div>
     <script>
         let bigContainer = document.querySelector(".bigContainer");
-        let smallContainer= document.querySelector(".smallContainer");
+        let smallContainer = document.querySelector(".smallContainer");
 
-        bigContainer.addEventListener("mousemove", mouseMoveHandler, false);
-        smallContainer.addEventListener("mousemove", mouseMoveHandler, false);
-
-        function mouseMoveHandler(e) {
-            if (e.target === smallContainer) {
-                e.target.style.backgroundColor = "red";
-            } else {
-                for (let child of e.target.childNodes) {
-                    if (child.className === "smallContainer") {
-                        child.style.backgroundColor = "silver";
-                    }
-                }
-            }
-        }
+        bigContainer.addEventListener("click", ()=>smallContainer.style.visibility="hidden", true);
+        smallContainer.addEventListener("click", ()=>smallContainer.style.visibility="visible", true);
 
     </script>
 </body>
