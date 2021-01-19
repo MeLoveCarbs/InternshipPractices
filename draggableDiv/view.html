@@ -14,6 +14,7 @@
             touch-action: none;
             user-select: none;
             text-align: center;
+            position: absolute;
         }
 
         #item p {
@@ -40,23 +41,31 @@
 </head>
 
 
-<body>
+<body style="overflow: hidden;">
     <div class="container">
         <div id="item">
             <p>Drag me!</p>
         </div>
     </div>
     <script>
-        var dragItem = document.querySelector("#item");
-        var container = document.querySelector(".container");
+        const PADDINGSTART = 8;
+        const PADDINGEND = 120;
+        let viewport = {
+            bottom: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+        };
 
-        var active = false;
-        var currentX;
-        var currentY;
-        var initialX;
-        var initialY;
-        var xOffset = 0;
-        var yOffset = 0;
+        let dragItem = document.querySelector("#item");
+        let container = document.querySelector(".container");
+
+        let active = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+
         container.addEventListener("touchstart", dragStart, false);
         container.addEventListener("touchend", dragEnd, false);
         container.addEventListener("touchmove", drag, false);
@@ -67,17 +76,21 @@
 
         function dragStart(e) {
             if (e.type === "touchstart") {
-                initialX = e.touches[0].clientX - xOffset;
-                initialY = e.touches[0].clientY - yOffset;
+                initialX = e.touches[0].clientX - dragItem.getBoundingClientRect().left;
+                initialY = e.touches[0].clientY - dragItem.getBoundingClientRect().top;
             } else {
-                initialX = e.clientX - xOffset;
-                initialY = e.clientY - yOffset;
+                initialX = e.clientX - dragItem.getBoundingClientRect().left;
+                initialY = e.clientY - dragItem.getBoundingClientRect().top;
             }
 
             if (e.target === dragItem) {
                 active = true;
             }
-            console.log(e.clientX, e.clientY, xOffset, yOffset, initialX, initialY)
+            viewport.bottom = document.body.clientHeight - PADDINGEND;
+            viewport.left = PADDINGSTART;
+            viewport.right = document.body.clientWidth - PADDINGEND;
+            viewport.top = PADDINGSTART;
+            console.log(viewport);
         }
 
         function dragEnd(e) {
@@ -96,15 +109,19 @@
                     currentY = e.clientY - initialY;
                 }
 
-                xOffset = currentX;
-                yOffset = currentY;
-
-                setTranslate(currentX, currentY, dragItem);
+                if (currentX < viewport.left || currentX > viewport.right || currentY < viewport.top || currentY > viewport.bottom) {
+                    active = false;
+                } else {
+                    setTranslate(currentX, currentY, dragItem);
+                }
             }
+            console.log()
         }
 
         function setTranslate(xPos, yPos, el) {
-            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+            console.log(xPos, yPos);
+            el.style.left = xPos + "px";
+            el.style.top = yPos + "px";
         } 
     </script>
 </body>
