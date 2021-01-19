@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, 
+        initial-scale=1.0, 
+        user-scalable=no" />
+    <style>
+        .bigContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50vh;
+            height: 50vh;
+            background-color: silver;
+        }
+
+        .smallContainer {
+            width: 20vh;
+            height: 20vh;
+            background-color: silver;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="bigContainer">
+        <div class="smallContainer">
+        </div>
+    </div>
+    <script>
+        let bigContainer = document.querySelector(".bigContainer");
+        let smallContainer= document.querySelector(".smallContainer");
+
+        bigContainer.addEventListener("mousemove", mouseMoveHandler, false);
+        smallContainer.addEventListener("mousemove", mouseMoveHandler, false);
+
+        function mouseMoveHandler(e) {
+            if (e.target === smallContainer) {
+                e.target.style.backgroundColor = "red";
+            } else {
+                for (let child of e.target.childNodes) {
+                    if (child.className === "smallContainer") {
+                        child.style.backgroundColor = "silver";
+                    }
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
