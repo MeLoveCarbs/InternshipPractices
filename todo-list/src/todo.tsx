@@ -1,27 +1,35 @@
-import React, { Component, Fragment, ReactElement } from 'react';
+import React, { Component, Dispatch, Fragment, ReactElement } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
+import { connect, ConnectedProps } from 'react-redux';
+import { addTodos, deleteTodos, markTodos, refreshTodos } from './actions/todoAction';
+import { RootState } from './reducers';
+import { MyState, MyTodo, TodoActionTypes } from './types';
 
 const ALL_TAB = 'ALL TODO TAB';
 const CURRENT_TAB = 'CURRENT TODO TAB';
 const FINISHED_TAB = 'FINISHED TODO TAB';
 
-type MyTodo = {
-    text: string;
-    current: boolean;
-    finished: boolean;
+const mapStateToProps = (state: RootState) => {
+    return {
+        allTodos: state.todosState.todos,
+    };
 };
-type MyState = {
-    allTodos: Array<MyTodo>;
-    currentTab: string;
-    currentInput: string;
+
+const mapDispatchToProps = (dispatch: Dispatch<TodoActionTypes>) => {
+    return {
+        dispatch,
+    };
 };
-export default class Todo extends Component<Record<string, unknown>, MyState> {
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+type Props = ConnectedProps<typeof connector>;
+
+class Todo extends Component<Props, MyState> {
     state: MyState = {
-        allTodos: [],
         currentTab: CURRENT_TAB,
         currentInput: '',
     };
-
     onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState((state) => ({
             ...state,
@@ -29,28 +37,19 @@ export default class Todo extends Component<Record<string, unknown>, MyState> {
         }));
     };
     addTodoHandler = (): void => {
-        this.setState((state) => ({
-            ...state,
-            allTodos: [...state.allTodos, { text: state.currentInput, current: true, finished: false }],
-        }));
+        this.props.dispatch(
+            addTodos({ text: this.state.currentInput, current: true, finished: false }, this.props.allTodos),
+        );
         this.setState((state) => ({
             ...state,
             currentInput: '',
         }));
     };
     deleteTodoHandler = (index: number): void => {
-        this.setState((state) => ({
-            ...state,
-            allTodos: state.allTodos.filter((_, i) => i !== index),
-        }));
+        this.props.dispatch(deleteTodos(index, this.props.allTodos));
     };
     markTodoHandler = (index: number): void => {
-        const auxAllTodos = [...this.state.allTodos];
-        auxAllTodos[index].finished = !auxAllTodos[index].finished;
-        this.setState((state) => ({
-            ...state,
-            allTodos: auxAllTodos,
-        }));
+        this.props.dispatch(markTodos(index, this.props.allTodos));
     };
     allTab = (): void => {
         this.setState((state) => ({
@@ -59,7 +58,7 @@ export default class Todo extends Component<Record<string, unknown>, MyState> {
         }));
     };
     currentTab = (): void => {
-        const auxAllTodos = this.state.allTodos.map((todo) => {
+        const auxAllTodos = this.props.allTodos.map((todo) => {
             const newTodo = JSON.parse(JSON.stringify(todo)); // deep copy
             if (newTodo.finished) {
                 newTodo.current = false;
@@ -72,8 +71,8 @@ export default class Todo extends Component<Record<string, unknown>, MyState> {
         this.setState((state) => ({
             ...state,
             currentTab: CURRENT_TAB,
-            allTodos: auxAllTodos,
         }));
+        this.props.dispatch(refreshTodos(auxAllTodos));
     };
     finishedTab = (): void => {
         this.setState((state) => ({
@@ -104,8 +103,7 @@ export default class Todo extends Component<Record<string, unknown>, MyState> {
         );
     };
     showSelectedList = (currentTab: string): Array<ReactElement> => {
-        console.log(this.state.allTodos);
-        const selectedList = this.state.allTodos.map((todo, i) => {
+        const selectedList = this.props.allTodos.map((todo, i) => {
             if (currentTab === CURRENT_TAB && todo.current) {
                 return this.rowMaker(todo, i);
             } else if (currentTab === FINISHED_TAB && todo.finished) {
@@ -115,7 +113,6 @@ export default class Todo extends Component<Record<string, unknown>, MyState> {
             }
             return <Fragment key={i}></Fragment>; // shouldn't reach here
         });
-        console.log(selectedList);
         return selectedList;
     };
     render(): ReactElement {
@@ -147,3 +144,5 @@ export default class Todo extends Component<Record<string, unknown>, MyState> {
         );
     }
 }
+
+export default connector(Todo);

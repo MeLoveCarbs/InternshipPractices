@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
+import StoreProvider from './storeProvider';
 import Todo from './todo';
 
-const App: React.FC = () => {
-    return <Todo />;
+const App = (): ReactElement => {
+    return (
+        <StoreProvider>
+            <Todo />
+        </StoreProvider>
+    );
 };
 
 export default App;
